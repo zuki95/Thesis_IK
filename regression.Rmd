@@ -1,0 +1,86 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+
+
+
+```{r load}
+
+mydf <- read.csv("final.csv") # load data
+nrow(mydf)
+ncol(mydf)
+
+```
+
+# Randomize data
+
+```{r, fig.width=5, fig.height=5}
+
+data_random <- mydf[sample(1:nrow(mydf)),]
+head(data_random)
+summary(data_random)
+
+```
+
+# Model Fitting
+
+```{r, fig.width=5, fig.height=5}
+
+train <- data_random[1:55766,]
+test <- data_random[55767:111532,]
+
+model <- glm(pump ~ sentiment + smiley_pos + smiley_neg  + FOMO + MOON + HODL + FUD + question + URL, data = train, family = binomial)
+model1 <-glm(pump ~ sentiment + smiley_pos + smiley_neg  + FOMO + MOON + HODL + FUD + question + URL, data = test, family = binomial)
+
+summary(model)
+
+
+```
+
+# Interpret results of model
+
+```{r, fig.width=5, fig.height=5}
+
+anova(model, test="Chisq")
+library(pscl)
+pR2(model)
+
+```
+
+
+# Predictive ability model
+
+```{r, fig.width=5, fig.height=5}
+
+#fitted.results <- predict(model,newdata=subset(test,select=c(2,3,4,5,6,23,24,29,30,31)),type='response')
+#train1 = data_random[1:55766,]
+
+#glm.fit <- glm(pump ~ sentiment + smiley_pos + smiley_neg  + FOMO + MOON + HODL + FUD + question + URL, data = data_random, family = binomial, subset = train1)
+
+#glm.probs <- predict(glm.fit, newdata = data_random[!train1], type = "response")
+#glm.pred <- ifelse(glm.probs > 0.5, "1", "0")
+
+#pump1 = data_random$pump[!train1]
+#table(glm.pred, pump)
+
+#mean(glm.pred == pump1)
+
+
+#misClasificError <- mean(fitted.results != test$pump)
+#print(paste('Accuracy',1-misClasificError))
+
+
+```
+

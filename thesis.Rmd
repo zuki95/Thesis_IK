@@ -1,0 +1,102 @@
+---
+title: "thesis"
+author: "Kamil Zukowski (S2732947)"
+date: "Generated on: `r date()`"
+output: 
+  html_document:
+    toc: true
+    code_folding: show
+    toc_float: 
+        collapsed: false
+        smooth_scroll: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r load}
+
+mydf <- read.csv("final.csv") # load data
+names(mydf)
+head(mydf)
+summary(mydf)
+nrow(mydf)
+ncol(mydf)
+
+#data <- subset(mydf,select=c(7,8,9,10,11,13,14,15,29,30,31,32,33))
+
+```
+
+```{r, fig.width=5, fig.height=5}
+
+#library(Amelia)
+#library(mlbench)
+#missmap(data, col=c("blue", "red"), legend=FALSE)
+
+#library(corrplot)
+#correlations <- cor(data[,1:13])
+#corrplot(correlations, method="circle")
+
+
+```
+
+# Interactions
+
+```{r, fig.width=5, fig.height=5}
+
+interaction.plot(mydf$FOMO, mydf$HODL, mydf$pump)
+interaction.plot(mydf$FOMO, mydf$FUD, mydf$pump)
+interaction.plot(mydf$FOMO, mydf$MOON, mydf$pump)
+interaction.plot(mydf$FOMO, mydf$question, mydf$pump)
+interaction.plot(mydf$FOMO, mydf$smiley_pos, mydf$pump)
+interaction.plot(mydf$FOMO, mydf$smiley_neg, mydf$pump)
+interaction.plot(mydf$FUD, mydf$URL, mydf$pump)
+
+#interaction.plot(mydf$FOMO, mydf$HODL, mydf$URL, mydf$pump)
+
+#interaction.plot(mydf$FOMO, mydf$HODL, mydf$FUD, mydf$pump)
+
+
+
+
+```
+
+
+
+# Logistic Regression
+
+```{r, fig.width=5, fig.height=5}
+
+# Logistics Regression
+glm.fit <- glm(pump ~ FUD * URL, data = mydf, family = binomial)
+
+summary(glm.fit)
+glm.probs <- predict(glm.fit,type = "response")
+glm.probs[1:5]
+
+glm.pred <- ifelse(glm.probs > 0.5, "1", "0")
+attach(mydf)
+table(glm.pred,pump)
+mean(glm.pred == pump)
+
+anova(glm.fit, test="Chisq")
+
+
+```
+
+```{r, fig.width=5, fig.height=5}
+
+#train <- mydf[1:55766,]
+#test <- mydf[55767:111534,]
+
+#model <- glm(pump ~ sentiment + smiley_pos + smiley_neg  + FOMO + MOON + HODL + FUD + question + URL, family = binomial(link='logit'),data=train)
+#summary(model)
+
+```
+
+
+

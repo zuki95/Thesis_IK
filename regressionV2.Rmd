@@ -1,0 +1,105 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+
+# Load Data
+
+```{r load}
+
+training.data.raw <- read.csv('final.csv',header=T,na.strings=c(""))
+sapply(training.data.raw,function(x) sum(is.na(x)))
+sapply(training.data.raw, function(x) length(unique(x)))
+nrow(training.data.raw)
+ncol(training.data.raw)
+
+```
+
+# Missing Data
+
+```{r, fig.width=5, fig.height=5}
+
+library(Amelia)
+#missmap(training.data.raw, main = "Missing values vs observed")
+
+data <- subset(training.data.raw,select=c(2,3,4,5,6,23,24,29,30,31))
+
+is.factor(data$pump)
+is.factor(data$sentiment)
+
+
+```
+
+# Model Fitting
+
+```{r, fig.width=5, fig.height=5}
+
+data <- subset(training.data.raw,select=c(2,3,4,5,6,23,24,29,30,31))
+
+train <- data[1:111000,]
+test <- data[111001:111534,]
+
+model <- glm(pump ~.,family=binomial(link='logit'),data=train)
+
+summary(model)
+
+anova(model, test="Chisq")
+
+library(pscl)
+pR2(model)
+
+
+```
+
+```{r, fig.width=5, fig.height=5}
+
+data <- subset(training.data.raw,select=c(2,3,4,5,6,23,24,29,30,31))
+train <- data[1:100000,]
+test <- data[100001:111534,]
+
+model <- glm(pump ~.,family=binomial(link='logit'),data=train)
+
+glm.probs <- predict(model,newdata=test, type = "response")
+glm.probs[1:5]
+
+glm.pred <- ifelse(glm.probs > 0.5, "1", "0")
+attach(training.data.raw)
+#table(glm.pred,pump)
+mean(glm.pred == pump)
+
+#fitted.results <- predict(model,newdata=subset(test,select=c(2,3,4,6,23,24,29)), type='response')
+#fitted.results <- ifelse(fitted.results > 0.5,1,0)
+#misClasificError <- mean(fitted.results != test$pump)
+#print(paste(1-misClasificError))
+
+```
+
+# Interactions
+
+```{r, fig.width=5, fig.height=5}
+
+fit <- glm(pump ~ FUD * URL, data=train)
+summary(fit)
+
+#interaction.plot(fit)
+
+#plot_model(fit, type = "pred", terms = c("FUD", "URL"))
+
+```
+
+
+
+
+
+
